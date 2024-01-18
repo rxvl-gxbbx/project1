@@ -1,5 +1,6 @@
 package com.rxvlvxr.dao;
 
+import com.rxvlvxr.models.Book;
 import com.rxvlvxr.models.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -24,15 +25,11 @@ public class PersonDAO {
     }
 
     public Optional<Person> show(int bookId) {
-        return jdbcTemplate.queryForStream("SELECT * FROM person WHERE person_id=?", new BeanPropertyRowMapper<>(Person.class), bookId).findAny();
+        return jdbcTemplate.queryForStream("SELECT * FROM person WHERE id=?", new BeanPropertyRowMapper<>(Person.class), bookId).findAny();
     }
 
     public Optional<Person> show(String name) {
         return jdbcTemplate.queryForStream("SELECT * FROM person WHERE name=?", new BeanPropertyRowMapper<>(Person.class), name).findAny();
-    }
-
-    public Optional<Person> join(int bookId) {
-        return jdbcTemplate.queryForStream("SELECT person.person_id, person.name, person.birth_year FROM project1.public.person JOIN book ON person.person_id=book.person_id WHERE book.book_id=?", new BeanPropertyRowMapper<>(Person.class), bookId).findAny();
     }
 
     public void save(Person person) {
@@ -40,10 +37,14 @@ public class PersonDAO {
     }
 
     public void update(int id, Person updatedPerson) {
-        jdbcTemplate.update("UPDATE person SET name=?, birth_year=? WHERE person_id=?", updatedPerson.getName(), updatedPerson.getBirthYear(), id);
+        jdbcTemplate.update("UPDATE person SET name=?, birth_year=? WHERE id=?", updatedPerson.getName(), updatedPerson.getBirthYear(), id);
     }
 
     public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM person WHERE person_id=?", id);
+        jdbcTemplate.update("DELETE FROM person WHERE id=?", id);
+    }
+
+    public List<Book> getBooksByPersonId(int personId) {
+        return jdbcTemplate.query("SELECT * FROM book WHERE person_id=?", new BeanPropertyRowMapper<>(Book.class), personId);
     }
 }

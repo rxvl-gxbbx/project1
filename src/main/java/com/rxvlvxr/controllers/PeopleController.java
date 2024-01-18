@@ -1,6 +1,5 @@
 package com.rxvlvxr.controllers;
 
-import com.rxvlvxr.dao.BookDAO;
 import com.rxvlvxr.dao.PersonDAO;
 import com.rxvlvxr.models.Person;
 import com.rxvlvxr.util.PersonValidator;
@@ -18,14 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class PeopleController {
 
     private final PersonDAO personDAO;
-    private final BookDAO bookDAO;
     private final PersonValidator personValidator;
     private final PersonYearValidator personYearValidator;
 
     @Autowired
-    public PeopleController(PersonDAO personDAO, BookDAO bookDAO, PersonValidator personValidator, PersonYearValidator personYearValidator) {
+    public PeopleController(PersonDAO personDAO, PersonValidator personValidator, PersonYearValidator personYearValidator) {
         this.personDAO = personDAO;
-        this.bookDAO = bookDAO;
         this.personValidator = personValidator;
         this.personYearValidator = personYearValidator;
     }
@@ -40,15 +37,19 @@ public class PeopleController {
     @PostMapping()
     public String create(@ModelAttribute("person") @Valid Person person,
                          BindingResult bindingResult) {
+        String view;
+
         personValidator.validate(person, bindingResult);
         personYearValidator.validate(person, bindingResult);
 
         if (bindingResult.hasErrors())
-            return "people/new";
+            view = "people/new";
+        else {
+            view = "redirect:/people";
+            personDAO.save(person);
+        }
 
-        personDAO.save(person);
-
-        return "redirect:/people";
+        return view;
     }
 
     @GetMapping("/new")
@@ -67,7 +68,7 @@ public class PeopleController {
     public String show(@PathVariable("id") int id, Model model) {
         personDAO.show(id).ifPresent(value -> model.addAttribute("person", value));
 
-        model.addAttribute("books", bookDAO.index(id));
+        model.addAttribute("books", personDAO.getBooksByPersonId(id));
 
         return "people/show";
     }
@@ -75,14 +76,18 @@ public class PeopleController {
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult,
                          @PathVariable("id") int id) {
+        String view;
+
         personYearValidator.validate(person, bindingResult);
 
         if (bindingResult.hasErrors())
-            return "people/edit";
+            view = "people/edit";
+        else {
+            view = "redirect:/people";
+            personDAO.update(id, person);
+        }
 
-        personDAO.update(id, person);
-
-        return "redirect:/people";
+        return view;
     }
 
     @DeleteMapping("/{id}")

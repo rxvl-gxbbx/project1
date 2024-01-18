@@ -40,8 +40,7 @@ public class BookController {
 
         bookValidator.validate(book, bindingResult);
 
-        if (bindingResult.hasErrors())
-            view = "books/new";
+        if (bindingResult.hasErrors()) view = "books/new";
         else {
             bookDAO.save(book);
             view = "redirect:/books";
@@ -57,9 +56,7 @@ public class BookController {
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable("id") int id, Model model) {
-
         bookDAO.show(id).ifPresent(value -> model.addAttribute("book", value));
-        personDAO.join(id).ifPresent(value -> model.addAttribute("person", value));
 
         return "books/edit";
     }
@@ -68,7 +65,8 @@ public class BookController {
     public String show(@PathVariable("id") int id, Model model, @ModelAttribute("emptyPerson") Person person) {
 
         bookDAO.show(id).ifPresent(value -> model.addAttribute("book", value));
-        personDAO.join(id).ifPresentOrElse(value -> model.addAttribute("person", value),
+        bookDAO.getPersonByBookId(id).ifPresentOrElse(
+                value -> model.addAttribute("person", value),
                 () -> model.addAttribute("people", personDAO.index()));
 
         return "books/show";
@@ -76,21 +74,14 @@ public class BookController {
 
     @PatchMapping("/{id}")
     public String update(@PathVariable("id") int id,
-                         @ModelAttribute("book") @Valid Book book, BindingResult bindingResult,
-                         @ModelAttribute("emptyPerson") Person person,
-                         Model model) {
+                         @ModelAttribute("book") @Valid Book book, BindingResult bindingResult) {
         String view;
 
         bookValidator.validate(book, bindingResult);
 
-        model.addAttribute("person", person);
-
-        if (bindingResult.hasErrors()) {
-            view = "books/edit";
-        } else {
-            if (person.getPersonId() == 0) bookDAO.update(id, book);
-            else bookDAO.update(id, person.getPersonId(), book);
-
+        if (bindingResult.hasErrors()) view = "books/edit";
+        else {
+            bookDAO.update(id, book);
             view = "redirect:/books";
         }
 
@@ -100,6 +91,23 @@ public class BookController {
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
         bookDAO.delete(id);
+
+        return "redirect:/books";
+    }
+
+    @PatchMapping("/{id}/release")
+    public String release(@PathVariable("id") int id) {
+        bookDAO.release(id);
+
+        return "redirect:/books";
+    }
+
+    @PatchMapping("/{id}/assign")
+    public String assign(@PathVariable("id") int bookId,
+                         @ModelAttribute("emptyPerson") Person person) {
+        int personId = person.getId();
+
+        bookDAO.assign(bookId, personId);
 
         return "redirect:/books";
     }

@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.time.Year;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class BookValidator implements Validator {
@@ -19,7 +20,7 @@ public class BookValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Book book = (Book) target;
 
-        int currentYear = Year.now().getValue();
+        int currentYear = LocalDateTime.now(ZoneId.systemDefault()).getYear();
 
         if (book.getYear() > currentYear)
             errors.rejectValue("year",

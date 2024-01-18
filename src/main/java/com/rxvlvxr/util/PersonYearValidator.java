@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.time.Year;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class PersonYearValidator implements Validator {
@@ -19,11 +20,12 @@ public class PersonYearValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Person person = (Person) target;
 
-        int currentYear = Year.now().getValue();
+        int currentYear = LocalDateTime.now(ZoneId.systemDefault()).getYear();
+        int minAge = 14;
 
-        if (person.getBirthYear() + 14 > currentYear)
+        if (person.getBirthYear() + minAge > currentYear)
             errors.rejectValue("birthYear",
                     "",
-                    "Превышено максимальное допустимое значения года рождения: " + (currentYear - 14));
+                    "Превышено максимальное допустимое значения года рождения: " + (currentYear - minAge));
     }
 }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public class Book {
 
-    private int bookId;
+    private int id;
 
     @NotBlank(message = "Поле названия книги должно быть заполнено")
     @Size(min = 2, max = 255, message = "Название должно быть в диапазоне от 2 до 100 символов")
@@ -24,12 +24,12 @@ public class Book {
     public Book() {
     }
 
-    public int getBookId() {
-        return bookId;
+    public int getId() {
+        return id;
     }
 
-    public void setBookId(int bookId) {
-        this.bookId = bookId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
