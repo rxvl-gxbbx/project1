@@ -8,6 +8,7 @@ import org.springframework.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+// класс для валидации сущности book
 @Component
 public class BookValidator implements Validator {
 
@@ -22,6 +23,7 @@ public class BookValidator implements Validator {
 
         int currentYear = LocalDateTime.now(ZoneId.systemDefault()).getYear();
 
+        // проверяем ограничение по году издания
         if (book.getYear() > currentYear)
             errors.rejectValue("year",
                     "",

@@ -16,7 +16,7 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 
 import javax.sql.DataSource;
 
-
+// класс конфигурации Spring MVC приложения
 @Configuration
 @ComponentScan("com.rxvlvxr")
 @EnableWebMvc
@@ -24,15 +24,18 @@ public class SpringConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
 
+    // внедрение зависимостей
     @Autowired
     public SpringConfig(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
+    //
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
+        // указываем путь к шаблонам
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
         templateResolver.setCharacterEncoding("UTF-8");
@@ -47,6 +50,7 @@ public class SpringConfig implements WebMvcConfigurer {
         return templateEngine;
     }
 
+    // настраиваем шаблонизатор, внедряем Thymeleaf 6
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
@@ -56,6 +60,7 @@ public class SpringConfig implements WebMvcConfigurer {
         registry.viewResolver(resolver);
     }
 
+    // внедряем зависимость PostgreSQL и указываем properties
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -68,6 +73,7 @@ public class SpringConfig implements WebMvcConfigurer {
         return dataSource;
     }
 
+    // внедряем зависимость Spring Data JDBC
     @Bean
     public JdbcTemplate jdbcTemplate() {
         return new JdbcTemplate(dataSource());

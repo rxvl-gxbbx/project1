@@ -2,7 +2,7 @@ package com.rxvlvxr.controllers;
 
 import com.rxvlvxr.dao.PersonDAO;
 import com.rxvlvxr.models.Person;
-import com.rxvlvxr.util.PersonValidator;
+import com.rxvlvxr.util.PersonNameValidator;
 import com.rxvlvxr.util.PersonYearValidator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,18 @@ import org.springframework.web.bind.annotation.*;
 public class PeopleController {
 
     private final PersonDAO personDAO;
-    private final PersonValidator personValidator;
+    private final PersonNameValidator personNameValidator;
     private final PersonYearValidator personYearValidator;
 
+    // внедрение зависимостей
     @Autowired
-    public PeopleController(PersonDAO personDAO, PersonValidator personValidator, PersonYearValidator personYearValidator) {
+    public PeopleController(PersonDAO personDAO, PersonNameValidator personNameValidator, PersonYearValidator personYearValidator) {
         this.personDAO = personDAO;
-        this.personValidator = personValidator;
+        this.personNameValidator = personNameValidator;
         this.personYearValidator = personYearValidator;
     }
 
+    // логика аналогична методу index в классе BookController
     @GetMapping()
     public String index(Model model) {
         model.addAttribute("people", personDAO.index());
@@ -39,7 +41,7 @@ public class PeopleController {
                          BindingResult bindingResult) {
         String view;
 
-        personValidator.validate(person, bindingResult);
+        personNameValidator.validate(person, bindingResult);
         personYearValidator.validate(person, bindingResult);
 
         if (bindingResult.hasErrors())

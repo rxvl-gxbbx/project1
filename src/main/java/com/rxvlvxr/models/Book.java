@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+// класс сущности book
 public class Book {
 
     private int id;
 
+    // ограничения по валидации
     @NotBlank(message = "Поле названия книги должно быть заполнено")
     @Size(min = 2, max = 255, message = "Название должно быть в диапазоне от 2 до 100 символов")
     @Pattern(regexp = "[A-ZА-ЯЁ][a-zа-яё]+[\\sA-zА-яё]*", message = "Пример ввода: Солярис")

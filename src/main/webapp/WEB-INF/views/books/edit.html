@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <title>Update book</title>
 </head>
+<!-- указываем цвет для класса error -->
 <style>
     .error {
         color: red;
     }
 </style>
 <body>
-
+<!--
+указываем действие (на какой URL надо будет перейти)
+берем modelAttribute book, который добавили в контроллере
+-->
 <form th:action="@{/books/{id}(id=${book.getId()})}" th:method="PATCH" th:object="${book}">
     <p>
         <label for="title">Введите название книги: </label>
         <input id="title" th:field="*{title}" type="text"/>
     </p>
+    <!-- если будет ошибка на данном поле, то выйдет message валидации, указанный в классе Book -->
     <p class="error" th:errors="*{title}" th:if="${#fields.hasErrors('title')}">Title error</p>
     <p>
         <label for="author">Введите автора: </label>

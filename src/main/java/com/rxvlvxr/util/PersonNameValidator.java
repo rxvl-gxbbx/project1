@@ -8,13 +8,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+// класс валидации поля name на уникальность в сущности person
 @Component
-public class PersonValidator implements Validator {
+public class PersonNameValidator implements Validator {
 
     public final PersonDAO personDAO;
 
+    // внедряем зависимость
     @Autowired
-    public PersonValidator(PersonDAO personDAO) {
+    public PersonNameValidator(PersonDAO personDAO) {
         this.personDAO = personDAO;
     }
 
@@ -27,6 +29,7 @@ public class PersonValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Person person = (Person) target;
 
+        // проверяем уникальность по имени (полю name)
         personDAO.show(person.getName()).ifPresent(value -> errors.rejectValue("name", "", "Такой человек уже существует"));
     }
 }

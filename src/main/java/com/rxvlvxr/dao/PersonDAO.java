@@ -44,6 +44,8 @@ public class PersonDAO {
         jdbcTemplate.update("DELETE FROM person WHERE id=?", id);
     }
 
+    // получаем список всех объектов типа Book по person_id (внешний ключ)
+    // т.е. все книги у которых person_id соответствует параметру personId
     public List<Book> getBooksByPersonId(int personId) {
         return jdbcTemplate.query("SELECT * FROM book WHERE person_id=?", new BeanPropertyRowMapper<>(Book.class), personId);
     }

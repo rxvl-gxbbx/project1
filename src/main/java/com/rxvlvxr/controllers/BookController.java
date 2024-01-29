@@ -20,6 +20,7 @@ public class BookController {
     private final PersonDAO personDAO;
     private final BookValidator bookValidator;
 
+    // внедрение зависимостей
     @Autowired
     public BookController(BookDAO bookDAO, PersonDAO personDAO, BookValidator bookValidator) {
         this.bookDAO = bookDAO;
@@ -27,6 +28,7 @@ public class BookController {
         this.bookValidator = bookValidator;
     }
 
+    // GET запрос, который возвращает страницу index.html со всеми данными из таблицы book
     @GetMapping
     public String index(Model model) {
         model.addAttribute("books", bookDAO.index());
@@ -34,12 +36,15 @@ public class BookController {
         return "books/index";
     }
 
+    // POST запрос, который при успешной валидации сохраняет объект типа Book в таблицу
     @PostMapping
     public String create(@ModelAttribute("book") @Valid Book book, BindingResult bindingResult) {
         String view;
 
+        // валидация
         bookValidator.validate(book, bindingResult);
 
+        // в случае ошибок будет возвращена страница добавления книги с требованиям валидации
         if (bindingResult.hasErrors()) view = "books/new";
         else {
             bookDAO.save(book);
@@ -49,11 +54,13 @@ public class BookController {
         return view;
     }
 
+    // возвращает страницу для добавления книги
     @GetMapping("/new")
     public String newBook(@ModelAttribute("book") Book book) {
         return "books/new";
     }
 
+    // возвращает страницу редактирования книги по id
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable("id") int id, Model model) {
         bookDAO.show(id).ifPresent(value -> model.addAttribute("book", value));
@@ -61,10 +68,13 @@ public class BookController {
         return "books/edit";
     }
 
+    // возвращает страницу книги по id
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model, @ModelAttribute("emptyPerson") Person person) {
 
         bookDAO.show(id).ifPresent(value -> model.addAttribute("book", value));
+        // в случае если книга находится у человека, то вернется держатель книги
+        // если нет, то будет возвращен список всех доступных людей для назначения книги
         bookDAO.getPersonByBookId(id).ifPresentOrElse(
                 value -> model.addAttribute("person", value),
                 () -> model.addAttribute("people", personDAO.index()));
@@ -72,6 +82,7 @@ public class BookController {
         return "books/show";
     }
 
+    // PATCH запрос для редактирования книги
     @PatchMapping("/{id}")
     public String update(@PathVariable("id") int id,
                          @ModelAttribute("book") @Valid Book book, BindingResult bindingResult) {
@@ -88,6 +99,7 @@ public class BookController {
         return view;
     }
 
+    // DELETE запрос, который удаляет строку из таблицы по id
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
         bookDAO.delete(id);
@@ -95,18 +107,22 @@ public class BookController {
         return "redirect:/books";
     }
 
+    // PATCH запрос при котором книга "освобождается"
     @PatchMapping("/{id}/release")
     public String release(@PathVariable("id") int id) {
+        // в строке таблицы значению person_id присваивается null
         bookDAO.release(id);
 
         return "redirect:/books";
     }
 
+    // PATCH запрос при котором книге присваивается человек
     @PatchMapping("/{id}/assign")
     public String assign(@PathVariable("id") int bookId,
                          @ModelAttribute("emptyPerson") Person person) {
         int personId = person.getId();
 
+        // в строке таблицы person_id присваивается значение из объекта Person, который был передан через @ModelAttribute
         bookDAO.assign(bookId, personId);
 
         return "redirect:/books";

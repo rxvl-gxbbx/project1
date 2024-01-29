@@ -8,9 +8,11 @@ import org.springframework.validation.Validator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+// класс для валидации возраста для регистрации в библиотеке
 @Component
 public class PersonYearValidator implements Validator {
 
+    // указываем что эта валидация относится к классу Person
     @Override
     public boolean supports(Class<?> clazz) {
         return Person.class.equals(clazz);
@@ -21,8 +23,10 @@ public class PersonYearValidator implements Validator {
         Person person = (Person) target;
 
         int currentYear = LocalDateTime.now(ZoneId.systemDefault()).getYear();
+        // минимальный возраст для регистрации в библиотеке
         int minAge = 14;
 
+        // валидируем поле
         if (person.getBirthYear() + minAge > currentYear)
             errors.rejectValue("birthYear",
                     "",
